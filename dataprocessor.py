@@ -10,7 +10,7 @@ class DataProcessor:
         pass
  
     def json_to_dataframe(self, data: dict):
-        # Преобразование данных в DataFrame
+        """Преобразует полученные данные после GET-запроса в Dataframe."""
         df = pd.DataFrame(data["securities"]["data"], columns=data["securities"]["columns"])
 
         # Фильтрация строк, где 'clearing' равно 'vk'
@@ -21,12 +21,7 @@ class DataProcessor:
         df_filtered.reset_index(drop=True, inplace=True)
 
         self.DATAFRAMES.append(df_filtered)
-
-        # print("Frame done!")
-        # print("==============")
-        # print(df_filtered)
-        # print("==============")
-
+        
         return df_filtered
     
 
@@ -47,15 +42,25 @@ class DataProcessor:
         merged_df.columns = new_column_names
 
         # Запись в excel файл / настройка файла 
-        with pd.ExcelWriter(self.EXCEL_FILEPATH, engine='openpyxl') as writer:
+        with pd.ExcelWriter(self.EXCEL_FILEPATH, engine='xlsxwriter') as writer:
             merged_df.to_excel(writer, index=False, sheet_name='Rates')
 
             # Получаем объект workbook и активный лист
             workbook = writer.book
             worksheet = writer.sheets['Rates']
 
-            # Делаю автоматическое выравнивание по ширине
-            
+            financial_format = workbook.add_format({'num_format': '#,##0.00;(#,##0.00)', 'align': 'right'})
+            center_format = workbook.add_format({'align': 'center'})
+
+            # Автовыравнивание и применение требуемых форматов
+            for column, label in enumerate(merged_df.columns):
+                series = merged_df[label]
+                max_len = max((
+                    series.astype(str).map(len).max(), 
+                    len(str(series.name))  
+                )) + 1
+                current_format = financial_format if label in ("Курс USD/RUB", "Курс JPY/RUB", "Результат") else center_format                 
+                worksheet.set_column(column, column, max_len, current_format)  
 
 
 

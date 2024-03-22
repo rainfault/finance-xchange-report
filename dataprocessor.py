@@ -33,12 +33,16 @@ class DataProcessor:
 
         merged_df = pd.concat((df1, df2), axis=1)
         
-        merged_df['ratio'] = df1['rate'] / df2['rate']
-
+        merged_df['ratio'] = (df1['rate'] / df2['rate']).round(2)
+  
         new_column_names = ['Дата USD/RUB', 'Курс USD/RUB', 'Время USD/RUB', 
                             'Дата JPY/RUB', 'Курс JPY/RUB', 'Время JPY/RUB', 
                             'Результат']
-
+        
+        # merged_df['Курс USD/RUB'] = merged_df['Курс USD/RUB'].round(2)
+        # merged_df['Курс JPY/RUB'] = merged_df['Курс USD/RUB'].round(2)
+        # merged_df['Результат'] = merged_df['Курс USD/RUB'].round(2)
+        
         merged_df.columns = new_column_names
 
         # Запись в excel файл / настройка файла 
@@ -55,6 +59,7 @@ class DataProcessor:
             # Автовыравнивание и применение требуемых форматов
             for column, label in enumerate(merged_df.columns):
                 series = merged_df[label]
+                print(series.astype(str).map(len).max(), len(str(series.name)))
                 max_len = max((
                     series.astype(str).map(len).max(), 
                     len(str(series.name))  

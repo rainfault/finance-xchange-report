@@ -2,8 +2,6 @@ import pandas as pd
 import win32com.client as win32
 from openpyxl import load_workbook
 from config import EXCEL_FILEPATH
-
-
 from config import EXCEL_FILEPATH
 
 class DataProcessor:
@@ -87,11 +85,11 @@ class DataProcessor:
             excel.Calculate()
             
             sum_value = sheet.Range('G22').Value
-            print(f'Результат автосуммы: {sum_value}')
 
             assert type(sum_value) in (int, float), "Сумма должна быть целым числом!" 
 
             sheet.Range('G22').ClearContents()
+
             workbook.Save()
             workbook.Close()
 

@@ -10,7 +10,6 @@ from config import (email_password,
                     address, port,
                     EXCEL_FILEPATH )
 
-
 class Sender:
 
     def send_with_attachment(self, rows: int) -> None:
@@ -48,6 +47,7 @@ class Sender:
 
     @staticmethod
     def connect_to_server_and_send(msg):
+        """Отправка сообщения с вложением на указанный e-mail."""
         try:
             server = smtplib.SMTP_SSL(address, port, timeout=3)
             # server.starttls()

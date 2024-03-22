@@ -19,9 +19,13 @@ if __name__ == "__main__":
 
     processor = DataProcessor()
 
+    # Работаю с таблицами
     processor.json_to_dataframe(dollar_to_rub_data)
     processor.json_to_dataframe(yen_to_rub_data)
-    processor.dataframe_to_excel()
+    total_rows = processor.dataframe_to_excel()
+
+    sender = Sender()
+    sender.send_with_attachment(total_rows)
 
 
 

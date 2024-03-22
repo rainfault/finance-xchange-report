@@ -1,10 +1,11 @@
 import pandas as pd
 import openpyxl
 
+from config import EXCEL_FILEPATH
+
 class DataProcessor:
     
     DATAFRAMES = []
-    EXCEL_FILEPATH = "output/statistics.xlsx"
 
     def __init__(self) -> None:
         pass
@@ -25,7 +26,7 @@ class DataProcessor:
         return df_filtered
     
 
-    def dataframe_to_excel(self):
+    def dataframe_to_excel(self) -> int:
         """Объединение таблицы, добавление столбца G и запись в excel-файл."""
         # Мерж котировок и добавление столбца их отношений
         
@@ -46,7 +47,7 @@ class DataProcessor:
         merged_df.columns = new_column_names
 
         # Запись в excel файл / настройка файла 
-        with pd.ExcelWriter(self.EXCEL_FILEPATH, engine='xlsxwriter') as writer:
+        with pd.ExcelWriter(EXCEL_FILEPATH, engine='xlsxwriter') as writer:
             merged_df.to_excel(writer, index=False, sheet_name='Rates')
 
             # Получаем объект workbook и активный лист
@@ -59,23 +60,14 @@ class DataProcessor:
             # Автовыравнивание и применение требуемых форматов
             for column, label in enumerate(merged_df.columns):
                 series = merged_df[label]
-                print(series.astype(str).map(len).max(), len(str(series.name)))
+  
                 max_len = max((
                     series.astype(str).map(len).max(), 
                     len(str(series.name))  
                 )) + 1
                 current_format = financial_format if label in ("Курс USD/RUB", "Курс JPY/RUB", "Результат") else center_format                 
-                worksheet.set_column(column, column, max_len, current_format)  
+                worksheet.set_column(column, column, max_len, current_format) 
 
-
-
-
-
-
-
-
-
-
-
-
-
+        return merged_df.shape[0]
+    
+    

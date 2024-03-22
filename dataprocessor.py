@@ -1,5 +1,8 @@
 import pandas as pd
-import openpyxl
+import win32com.client as win32
+from openpyxl import load_workbook
+from config import EXCEL_FILEPATH
+
 
 from config import EXCEL_FILEPATH
 
@@ -14,10 +17,8 @@ class DataProcessor:
         """Преобразует полученные данные после GET-запроса в Dataframe."""
         df = pd.DataFrame(data["securities"]["data"], columns=data["securities"]["columns"])
 
-        # Фильтрация строк, где 'clearing' равно 'vk'
         df_vk = df[df["clearing"] == "vk"]
 
-        # Выбор нужных столбцов
         df_filtered = df_vk[["tradedate", "rate", "tradetime"]]
         df_filtered.reset_index(drop=True, inplace=True)
 
@@ -28,8 +29,8 @@ class DataProcessor:
 
     def dataframe_to_excel(self) -> int:
         """Объединение таблицы, добавление столбца G и запись в excel-файл."""
-        # Мерж котировок и добавление столбца их отношений
         
+        # Мерж котировок и добавление столбца их отношений
         df1, df2 = self.DATAFRAMES[0], self.DATAFRAMES[1]
 
         merged_df = pd.concat((df1, df2), axis=1)
@@ -70,4 +71,35 @@ class DataProcessor:
 
         return merged_df.shape[0]
     
+    def verify_autosum(self):
+        """Проверка корректности работы автосуммы."""
+
+        workbook = load_workbook(filename=EXCEL_FILEPATH)
+        sheet = workbook.active 
+        sheet['G22'] = '=SUM(G2:G21)'
+        workbook.save(filename=EXCEL_FILEPATH)
+
+        excel = win32.gencache.EnsureDispatch('Excel.Application')
+
+        try:
+            workbook = excel.Workbooks.Open(EXCEL_FILEPATH)
+            sheet = workbook.ActiveSheet
+            excel.Calculate()
+            
+            sum_value = sheet.Range('G22').Value
+            print(f'Результат автосуммы: {sum_value}')
+
+            assert type(sum_value) in (int, float), "Сумма должна быть целым числом!" 
+
+            sheet.Range('G22').ClearContents()
+            workbook.Save()
+            workbook.Close()
+
+        except Exception as e:
+            print(f'Ошибка: {e}')
+        finally:
+            excel.Quit()
+
+    
+
     

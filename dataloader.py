@@ -22,4 +22,3 @@ class Loader:
 
         except requests.exceptions.Timeout as e:
             print("Timeout while connection to moex.")
-

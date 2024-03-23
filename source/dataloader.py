@@ -13,9 +13,9 @@ class Loader:
 
         
             filename = 'data.json'
-        
-            with open(filename, 'w') as file:
-                json.dump(data, file, indent=4)
+
+            # with open(filename, 'w') as file:
+            #     json.dump(data, file, indent=4)
 
             return data
 

@@ -39,7 +39,7 @@ class Sender:
         part = MIMEBase('application', 'octet-stream')
         part.set_payload((attachment).read())
         encoders.encode_base64(part)
-        part.add_header('Content-Disposition', "attachment; filename= " + EXCEL_FILEPATH)
+        part.add_header('Content-Disposition', "attachment; filename= " + "report.xlsx")
 
         message.attach(part)
         
